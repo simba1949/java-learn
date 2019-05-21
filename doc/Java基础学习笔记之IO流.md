@@ -1064,7 +1064,7 @@ public static void readAndWrite(){
 
 > 只有实现 Serializable 接口才能实现序列化和反序列化
 
-ObjectInputStream(序列化) & OjectOutputStream(反序列化)
+##### ObjectInputStream(序列化) & OjectOutputStream(反序列化)
 
 ```java
 package top.simba1949.common;
@@ -1130,15 +1130,239 @@ public static void encodeAndDecode(){
 
 ### 打印流
 
-PrintStream
+##### PrintStream
+
+```java
+public static void printStream() throws FileNotFoundException {
+    PrintStream ps = out;
+    ps.println("打印流");
+    ps.close();
+
+    String str = "T:/IDE/IDEA/Workspace/java-learn/java-io/src/main/resources/file/fileio/printStream.txt";
+    PrintStream printStream = new PrintStream(new BufferedOutputStream(new FileOutputStream(str)), true);
+    // 打印流重定向到文件中
+    System.setOut(printStream);
+    printStream.println("重定向到文件中");
+    printStream.close();
+
+    // 在重定向到控制台
+    System.setOut(new PrintStream(new BufferedOutputStream(new FileOutputStream(FileDescriptor.out)), true));
+    System.out.println("重定向到控制台");
+
+}
+```
+
+PrintWriter
+
+```java
+public static void printWriter() throws FileNotFoundException {
+    String src = "T:/IDE/IDEA/Workspace/java-learn/java-io/src/main/resources/file/fileio/printWriter.txt";
+    PrintWriter printWriter = new PrintWriter(new BufferedOutputStream(new FileOutputStream(new File(src))));
+    printWriter.println("printWriter 流笔记");
+    printWriter.flush();
+    printWriter.close();
+}
+```
 
 ### 随机流
 
-RandomAccessFile
+##### RandomAccessFile
+
+```java
+/**
+	 * 体验 RandomAccessFile.seek(偏移量) 读取数据
+	 * @throws IOException
+	 */
+public static void randomAccessFile() throws IOException {
+    String src = "T:/IDE/IDEA/Workspace/java-learn/java-io/src/main/resources/file/fileio/randomAccessFileSrc.txt";
+    RandomAccessFile rw = new RandomAccessFile(new File(src), "rw");
+    rw.seek(2);
+    byte[] flush = new byte[1024];
+    int len = -1;
+    while ((len = rw.read(flush)) != -1){
+        System.out.println(new String(flush, 0, len));
+        rw.write(flush, 0, len);
+    }
+    rw.close();
+}
+
+/**
+	 * 拆分文件
+	 * @throws IOException
+	 */
+public static void splitFileApp() throws IOException {
+    String src = "T:/IDE/IDEA/Workspace/java-learn/java-io/src/main/resources/file/random/src/randomAccessFileSrc.txt";
+    File file = new File(src);
+    // 文件总字节数
+    long length = file.length();
+    // 每块区域的大小
+    int blockSize = 200;
+    // 多少块
+    int totalNum = (int) (length % blockSize == 0 ? length/blockSize : length/blockSize + 1);
+
+    for (int i = 0; i < totalNum; i++){
+        if (i == (totalNum - 1)){
+            // 说明是最后一块
+            // 考虑最后一块区域
+            int lastBlockSize = (int) (length % blockSize == 0 ? blockSize : (length - (length/blockSize) * blockSize));
+            read(i, blockSize, lastBlockSize, file);
+        }else {
+            // 中间
+            read(i, blockSize, blockSize, file);
+        }
+    }
+}
+
+public static void read(int blockNum, int blockSize, int readLength, File file) throws IOException {
+    String dest = "T:/IDE/IDEA/Workspace/java-learn/java-io/src/main/resources/file/random/split/" + blockNum + ".tmp";
+    BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(new File(dest)));
+    RandomAccessFile ra = new RandomAccessFile(file, "rw");
+    ra.seek(blockNum * blockSize);
+    byte[] flush = new byte[readLength];
+    ra.read(flush);
+    bos.write(flush, 0, readLength);
+    bos.close();
+    ra.close();
+}
+```
 
 ### 合并流
 
-SequenceInputStream
+##### SequenceInputStream
+
+```java
+public static void write() throws IOException {
+    String splitDriPath = "T:/IDE/IDEA/Workspace/java-learn/java-io/src/main/resources/file/random/split";
+    File file = new File(splitDriPath);
+
+    // 创建输出源
+    String destPath = "T:/IDE/IDEA/Workspace/java-learn/java-io/src/main/resources/file/random/group/group.txt";
+    BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(destPath, true));
+
+    Vector<InputStream> vector = new Vector<InputStream>();
+    SequenceInputStream sis = null;
+    for (int i = 0; i < file.listFiles().length; i++){
+        vector.add(new BufferedInputStream(new FileInputStream(new File(splitDriPath + "/" + i + ".tmp"))));
+    }
+    sis = new SequenceInputStream(vector.elements());
+
+    byte[] flush = new byte[1024];
+    int len = -1;
+    while ((len = sis.read(flush)) != -1){
+        bos.write(flush, 0, len);
+    }
+    bos.flush();
+    bos.close();
+    sis.close();
+}
+```
+
+## Common-IO
+
+```java
+public static void main(String[] args) {
+    // 统计字节数
+    long fileLen = FileUtils.sizeOf(new File(""));
+    // 获取指定目录所有文件
+    Collection<File> listFiles = FileUtils.listFiles(
+        // 指定路径
+        new File(""),
+        // 文件过滤
+        FileFilterUtils.and(new SuffixFileFilter("java")),
+        // 文件夹过滤
+        DirectoryFileFilter.INSTANCE);
+
+    try {
+        // 指定字符集读取文件
+        String fileString = FileUtils.readFileToString(new File(""), "utf-8");
+    } catch (IOException e) {
+        e.printStackTrace();
+    }
+
+    try {
+        // 读取每行数据
+        List<String> strings = FileUtils.readLines(new File(""), "utf-8");
+    } catch (IOException e) {
+        e.printStackTrace();
+    }
+
+    try {
+        // 将文件读取为字节数组
+        byte[] bytes = FileUtils.readFileToByteArray(new File(""));
+    } catch (IOException e) {
+        e.printStackTrace();
+    }
+
+    try {
+        //
+        LineIterator lineIterator = FileUtils.lineIterator(new File(""));
+        while (lineIterator.hasNext()){
+            String next = lineIterator.next();
+        }
+    } catch (IOException e) {
+        e.printStackTrace();
+    }
+
+    try {
+        // 将字符串写到文件中
+        String data = "";
+        FileUtils.write(new File(""), data,"utf-8", true);
+    } catch (IOException e) {
+        e.printStackTrace();
+    }
+
+    try {
+        // 将字节数组写到文件中
+        byte[] data = new byte[10];
+        FileUtils.writeByteArrayToFile(new File(""), data);
+    } catch (IOException e) {
+        e.printStackTrace();
+    }
+
+    try {
+        // 写列表
+        List<String> list = new ArrayList<String>();
+        FileUtils.writeLines(new File(""), list, true);
+    } catch (IOException e) {
+        e.printStackTrace();
+    }
+
+    try {
+        // 拷贝文件
+        FileUtils.copyFile(new File("srcFile"), new File("destFile"));
+    } catch (IOException e) {
+        e.printStackTrace();
+    }
+
+    try {
+        // 拷贝文件夹
+        FileUtils.copyDirectory(new File("srcDir"), new File("destDir"));
+    } catch (IOException e) {
+        e.printStackTrace();
+    }
+
+    try {
+        // 拷贝文件到文件夹中
+        FileUtils.copyFileToDirectory(new File("srcFile"), new File("destDir"));
+    } catch (IOException e) {
+        e.printStackTrace();
+    }
+
+    try {
+        // 拷贝文件夹到文件夹下
+        FileUtils.copyDirectoryToDirectory(new File("srcDir"), new File("destDir"));
+    } catch (IOException e) {
+        e.printStackTrace();
+    }
+
+    try {
+        String datas = IOUtils.toString(new URL("https://www.baidu.com"), "UTF-8");
+        System.out.println(datas);
+    } catch (IOException e) {
+        e.printStackTrace();
+    }
+}
+```
 
 
 
