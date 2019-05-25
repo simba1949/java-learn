@@ -12,6 +12,7 @@ public class ImplCallable implements Callable<Object> {
 	 * @return
 	 * @throws Exception
 	 */
+	@Override
 	public Object call() throws Exception {
 		System.out.println(Thread.currentThread().getName() + "多线程实现方式三：实现 Callable 接口");
 		return "SUCCESS";
