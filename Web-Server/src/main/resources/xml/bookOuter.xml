@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE book SYSTEM "bookOuter.dtd">
+<book>
+    <bookName></bookName>
+    <publishedDate></publishedDate>
+    <author>
+        <authorName></authorName>
+        <birthday></birthday>
+    </author>
+</book>

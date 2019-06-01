@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE book [
+        <!ELEMENT book (bookName, publishedDate, author)>
+        <!ELEMENT bookName (#PCDATA)>
+        <!ELEMENT publishedDate (#PCDATA)>
+        <!ELEMENT author (authorName, birthday)>
+        <!ELEMENT authorName (#PCDATA)>
+        <!ELEMENT birthday (#PCDATA)>
+        ]>
+<book>
+    <bookName></bookName>
+    <publishedDate></publishedDate>
+    <author>
+        <authorName></authorName>
+        <birthday></birthday>
+    </author>
+</book>

@@ -18,6 +18,8 @@
         <module>java-enum</module>
         <module>java-multi-thread</module>
         <module>java-socket</module>
+        <module>Web-Server</module>
+        <module>java-annotation</module>
     </modules>
 
     <build>

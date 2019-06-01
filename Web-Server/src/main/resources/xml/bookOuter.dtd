@@ -1,0 +1,6 @@
+<!ELEMENT book (bookName, publishedDate, author)>
+<!ELEMENT bookName (#PCDATA)>
+<!ELEMENT publishedDate (#PCDATA)>
+<!ELEMENT author (authorName, birthday)>
+<!ELEMENT authorName (#PCDATA)>
+<!ELEMENT birthday (#PCDATA)>
