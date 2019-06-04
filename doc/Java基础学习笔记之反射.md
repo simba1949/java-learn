@@ -210,7 +210,33 @@ usernameField.setAccessible(true);
 usernameField.set(userForFiled, "杜甫");
 ```
 
+## 动态编译*
 
+动态编译的两种做法
+
+### Runtime
+
+通过 Runtime 调用 javac，启动新进程去操作
+
+```java
+Runtime runtime = Runtime.getRuntime();
+Process process = runtime.exec("javac -cp ./ HelloWorld.java");
+```
+
+### JavaCompiler
+
+通过 JavaCompiler 动态编译
+
+```java
+JavaCompiler javaCompiler = ToolProvider.getSystemJavaCompiler();
+// 第一个参数：为 Java 编译器提供参数
+// 第二个参数：得到 Java 编译器的输出信息
+// 第三个参数：接收编译器的错误信息
+// 第四个参数：可变参数（字符串数组），能传一个或者多个 Java 源文件
+// result 为 0 表示编译成功，非 0 表示编译失败
+int result = javaCompiler.run(null, null, null, sourceFile);
+System.out.println(result == 0 ? "编译成功" : "编译失败");
+```
 
 
 
